@@ -1,16 +1,23 @@
 package com.nexus.service;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.*;
-import com.nimbusds.jwt.*;
-import com.nexus.domain.User;
-import com.nexus.exception.AuthException;
-import com.nexus.repository.UserRepository;
+import java.util.Date;
+
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
+import com.nexus.domain.User;
+import com.nexus.exception.AuthException;
+import com.nexus.repository.UserRepository;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 /**
  * Façade over auth operations: registration, login, token verification.
@@ -121,6 +128,7 @@ public final class AuthService {
 
     private String generateToken(User user) {
         try {
+            // Standard JWT claims: sub (subject) is user ID, plus custom claims for username and display name.
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .subject(user.getId())
                 .claim("username", user.getUsername())

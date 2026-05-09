@@ -59,6 +59,7 @@ public final class MySQLUserRepository implements UserRepository {
     }
 
     @Override
+    // Using Optional here is to represent the possibility that a user with the given ID may not exist in the database.
     public Optional<User> findById(String id) {
         final String sql =
             "SELECT id, username, password_hash, display_name, created_at, is_active " +
